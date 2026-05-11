@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NeuroNarrate AI — The Future of Human Expression</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #04040a; --surface: #0a0a14; --card: #0f0f1e; --border: #1a1a30;
+    --accent: #6c63ff; --alt: #ff6b9d; --gold: #f5c842; --cyan: #00e5ff;
+    --text: #e8e8f0; --muted: #6b6b8a; --success: #00ff88;
+  }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: 'Space Mono', monospace; min-height: 100vh; overflow-x: hidden; }
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: #6c63ff44; border-radius: 2px; }
+
+  /* ── ANIMATIONS ── */
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+  @keyframes pulse { 0%,100%{opacity:.3} 50%{opacity:.8} }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+  @keyframes countUp { from{opacity:0;transform:scale(.8)} to{opacity:1;transform:scale(1)} }
+  @keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+  @keyframes spin { to{transform:rotate(360deg)} }
+  @keyframes orb1 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(30px,-20px) scale(1.05)} }
+  @keyframes orb2 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(-20px,30px) scale(0.95)} }
+
+  /* ── LAYOUT ── */
+  .page { display:none; min-height:100vh; padding-top:80px; }
+  .page.active { display:block; animation: fadeIn 0.3s ease; }
+  .container { max-width:1200px; margin:0 auto; padding:0 24px; }
+  .container-sm { max-width:900px; margin:0 auto; padding:0 24px; }
+
+  /* ── NAV ── */
+  nav {
+    position:fixed; top:0; left:0; right:0; z-index:1000; height:64px;
+    display:flex; align-items:center;
+    transition:background .3s, border-color .3s, backdrop-filter .3s;
+  }
+  nav.scrolled {
+    background:rgba(4,4,10,.95); backdrop-filter:blur(20px);
+    border-bottom:1px solid var(--border);
+  }
+  nav .nav-inner { display:flex; align-items:center; gap:24px; width:100%; max-width:1200px; margin:0 auto; padding:0 24px; }
+  .logo { display:flex; align-items:center; gap:10px; cursor:pointer; margin-right:auto; text-decoration:none; }
+  .logo-icon {
+    width:32px; height:32px; border-radius:8px;
+    background:linear-gradient(135deg,var(--accent),var(--alt));
+    display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;
+  }
+  .logo-text { font-family:'Orbitron',monospace; font-size:16px; font-weight:700; color:var(--text); letter-spacing:.05em; }
+  .logo-text span { color:var(--accent); }
+  .nav-link {
+    font-family:'Orbitron',monospace; font-size:12px; color:var(--muted); cursor:pointer;
+    letter-spacing:.05em; border-bottom:1px solid transparent; padding-bottom:2px;
+    transition:color .2s, border-color .2s; white-space:nowrap;
+  }
+  .nav-link:hover, .nav-link.active { color:var(--accent); border-color:var(--accent); }
+  .nav-mobile-btn { display:none; background:none; border:none; color:var(--text); font-size:22px; cursor:pointer; margin-left:auto; }
+  @media(max-width:768px) {
+    .nav-links { display:none; flex-direction:column; position:fixed; top:64px; left:0; right:0; background:rgba(4,4,10,.98); padding:20px 24px; gap:16px; border-bottom:1px solid var(--border); z-index:999; }
+    .nav-links.open { display:flex; }
+    .nav-mobile-btn { display:block; }
+    .nav-inner .nav-link { display:none; }
+    .nav-inner .btn-sm { display:none; }
+  }
+
+  /* ── BUTTONS ── */
+  .btn {
+    font-family:'Orbitron',monospace; font-weight:600; letter-spacing:.08em;
+    border-radius:8px; cursor:pointer; transition:all .2s ease; border:1px solid;
+    display:inline-flex; align-items:center; gap:6px;
+  }
+  .btn:disabled { opacity:.5; cursor:not-allowed; }
+  .btn-md { padding:10px 24px; font-size:13px; }
+  .btn-lg { padding:14px 32px; font-size:15px; }
+  .btn-sm { padding:6px 16px; font-size:11px; }
+  .btn-primary { border-color:#6c63ff88; color:#fff; background:transparent; }
+  .btn-primary:hover:not(:disabled) { border-color:var(--accent); background:#6c63ff22; box-shadow:0 0 20px #6c63ff66, inset 0 0 20px #6c63ff11; }
+  .btn-secondary { border-color:#ff6b9d88; color:#fff; background:transparent; }
+  .btn-secondary:hover:not(:disabled) { border-color:var(--alt); background:#ff6b9d22; box-shadow:0 0 20px #ff6b9d66; }
+  .btn-ghost { border-color:#00e5ff88; color:var(--cyan); background:transparent; }
+  .btn-ghost:hover:not(:disabled) { border-color:var(--cyan); background:#00e5ff22; box-shadow:0 0 20px #00e5ff66; }
+  .btn-gold { border-color:#f5c84288; color:var(--gold); background:transparent; }
+  .btn-gold:hover:not(:disabled) { border-color:var(--gold); background:#f5c84222; box-shadow:0 0 20px #f5c84266; }
+
+  /* ── GLASS CARD ── */
+  .card {
+    background:rgba(15,15,30,.7); backdrop-filter:blur(20px);
+    border:1px solid #6c63ff22; border-radius:16px; padding:24px;
+    box-shadow:0 4px 20px rgba(0,0,0,.4); transition:all .3s ease;
+  }
+  .card:hover { border-color:#6c63ff44; box-shadow:0 8px 40px #6c63ff22; }
+  .card-alt:hover { border-color:#ff6b9d44; box-shadow:0 8px 40px #ff6b9d22; }
+  .card-cyan:hover { border-color:#00e5ff44; box-shadow:0 8px 40px #00e5ff22; }
+  .card-gold { border-color:#f5c84222; }
+  .card-gold:hover { border-color:#f5c84244; box-shadow:0 8px 40px #f5c84222; }
+  .card-success:hover { border-color:#00ff8844; box-shadow:0 8px 40px #00ff8822; }
+
+  /* ── BADGES ── */
+  .badge { display:inline-flex; align-items:center; gap:6px; padding:6px 16px; border-radius:100px; font-size:11px; font-family:'Orbitron',monospace; letter-spacing:.12em; }
+  .badge-live { border:1px solid #6c63ff44; background:#6c63ff11; color:var(--cyan); }
+  .badge-dot { width:6px; height:6px; border-radius:50%; background:var(--success); box-shadow:0 0 8px var(--success); display:inline-block; }
+
+  /* ── HERO ── */
+  #home { padding-top:0; }
+  .hero { text-align:center; padding:120px 24px 60px; max-width:960px; margin:0 auto; }
+  .hero h1 { font-family:'Orbitron',monospace; font-size:clamp(38px,6vw,78px); font-weight:900; line-height:1.06; margin-bottom:24px; animation:fadeUp .8s ease .2s both; }
+  .hero p { font-size:17px; color:var(--muted); max-width:600px; margin:0 auto 48px; line-height:1.7; animation:fadeUp .8s ease .4s both; }
+  .hero-btns { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; animation:fadeUp .8s ease .6s both; }
+  .cursor { animation:blink 1s infinite; color:var(--accent); }
+  #typewriter { color:var(--cyan); }
+
+  /* ── STATS GRID ── */
+  .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-top:70px; animation:fadeUp 1s ease .8s both; }
+  @media(max-width:700px){ .stats-grid { grid-template-columns:repeat(2,1fr); } }
+  .stat-card { text-align:center; padding:20px; }
+  .stat-value { font-size:30px; font-weight:800; font-family:'Orbitron',monospace; margin-bottom:4px; }
+  .stat-label { font-size:11px; color:var(--muted); letter-spacing:.1em; text-transform:uppercase; }
+  .stat-icon { font-size:24px; margin-bottom:8px; }
+
+  /* ── FEATURE GRID ── */
+  .feature-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:20px; }
+  .feature-card { cursor:default; }
+  .feature-icon { font-size:32px; margin-bottom:12px; }
+  .feature-title { font-family:'Orbitron',monospace; font-size:14px; margin-bottom:8px; }
+  .feature-desc { font-size:13px; color:var(--muted); line-height:1.6; }
+
+  /* ── PILL TAGS ── */
+  .pill-row { display:flex; flex-wrap:wrap; gap:12px; justify-content:center; }
+  .pill {
+    padding:12px 20px; border-radius:100px; cursor:pointer; font-size:13px;
+    border:1px solid var(--border); background:var(--card); transition:all .2s;
+    display:flex; align-items:center; gap:8px; font-family:'Space Mono',monospace;
+  }
+  .pill:hover { border-color:var(--accent); box-shadow:0 0 16px #6c63ff33; }
+
+  /* ── GENERATOR ── */
+  .gen-grid { display:grid; grid-template-columns:340px 1fr; gap:24px; align-items:start; }
+  @media(max-width:900px){ .gen-grid { grid-template-columns:1fr; } }
+
+  .section-label { font-size:10px; color:var(--muted); letter-spacing:.12em; font-family:'Orbitron',monospace; margin-bottom:8px; display:block; text-transform:uppercase; }
+
+  .content-type-list { display:flex; flex-direction:column; gap:6px; }
+  .ct-item {
+    padding:10px 12px; border-radius:8px; cursor:pointer;
+    border:1px solid var(--border); display:flex; align-items:center; gap:10px; transition:all .2s;
+  }
+  .ct-item:hover { border-color:#6c63ff66; }
+  .ct-item.active { border-color:var(--accent); background:#6c63ff18; }
+  .ct-name { font-size:13px; font-weight:600; transition:color .2s; }
+  .ct-item.active .ct-name { color:var(--accent); }
+  .ct-desc { font-size:11px; color:var(--muted); }
+
+  .chips { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px; }
+  .chip {
+    padding:4px 12px; border-radius:100px; cursor:pointer; font-size:12px; transition:all .15s;
+    border:1px solid var(--border); color:var(--muted); background:transparent;
+  }
+  .chip.active-tone { border-color:var(--cyan); color:var(--cyan); background:#00e5ff11; }
+  .chip.active-emotion { border-color:var(--alt); color:var(--alt); background:#ff6b9d11; }
+  .chip.active-personality { border-color:var(--gold); color:var(--gold); background:#f5c84211; }
+
+  .slider-wrap { margin-bottom:16px; }
+  .slider-wrap input[type=range] { width:100%; accent-color:var(--accent); }
+  .slider-labels { display:flex; justify-content:space-between; font-size:10px; color:var(--muted); margin-top:4px; }
+
+  .toggle-row { display:flex; align-items:center; gap:10px; margin-top:12px; }
+  .toggle {
+    width:40px; height:22px; border-radius:100px; cursor:pointer; transition:background .3s; position:relative; flex-shrink:0;
+    background:var(--border);
+  }
+  .toggle.on { background:var(--alt); }
+  .toggle-knob {
+    position:absolute; top:3px; left:3px; width:16px; height:16px;
+    border-radius:50%; background:#fff; transition:left .3s;
+  }
+  .toggle.on .toggle-knob { left:21px; }
+  .toggle-label { font-size:12px; color:var(--muted); transition:color .3s; }
+  .toggle.on + .toggle-label { color:var(--alt); }
+
+  textarea, input[type=text], input[type=email] {
+    background:rgba(0,0,0,.4); border:1px solid var(--border); border-radius:8px;
+    color:var(--text); font-family:'Space Mono',monospace; font-size:14px;
+    outline:none; transition:border-color .2s; width:100%;
+  }
+  textarea { padding:14px; resize:vertical; line-height:1.6; }
+  input[type=text], input[type=email] { padding:10px 14px; }
+  textarea:focus, input:focus { border-color:var(--accent); }
+
+  /* Output skeleton */
+  .skeleton { height:14px; border-radius:4px; background:var(--border); animation:pulse 1.5s infinite; margin-bottom:12px; }
+
+  /* Viral bar */
+  .viral-bar-bg { height:4px; background:var(--border); border-radius:100px; flex:1; }
+  .viral-bar-fill { height:100%; border-radius:100px; transition:width .8s ease; }
+
+  /* ── DASHBOARD ── */
+  .dash-grid-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
+  @media(max-width:900px){ .dash-grid-4 { grid-template-columns:repeat(2,1fr); } }
+  @media(max-width:500px){ .dash-grid-4 { grid-template-columns:1fr 1fr; } }
+  .dash-grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+  @media(max-width:700px){ .dash-grid-3 { grid-template-columns:1fr; } }
+  .dash-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+  @media(max-width:700px){ .dash-grid-2 { grid-template-columns:1fr; } }
+
+  /* Sparkline */
+  .sparkline svg { display:block; }
+
+  /* Activity row */
+  .activity-row {
+    display:flex; align-items:center; gap:12px; padding:12px 16px;
+    background:rgba(0,0,0,.3); border-radius:8px; border:1px solid var(--border);
+  }
+  .activity-type { font-size:11px; color:var(--muted); font-family:'Orbitron',monospace; min-width:110px; }
+  .activity-title { flex:1; font-size:13px; color:var(--text); }
+  .activity-emotion { font-size:11px; padding:2px 8px; border-radius:100px; background:#ff6b9d22; color:var(--alt); white-space:nowrap; }
+  .activity-viral { font-size:11px; font-family:'Orbitron',monospace; }
+  .activity-time { font-size:11px; color:var(--muted); white-space:nowrap; }
+
+  /* Progress bar */
+  .prog-bar { height:4px; background:var(--border); border-radius:100px; }
+  .prog-fill { height:100%; border-radius:100px; transition:width 1s ease; }
+
+  /* ── PRICING ── */
+  .pricing-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
+  @media(max-width:800px){ .pricing-grid { grid-template-columns:1fr; max-width:400px; margin:0 auto; } }
+  .popular-badge {
+    position:absolute; top:-14px; left:50%; transform:translateX(-50%);
+    padding:4px 16px; background:var(--accent); border-radius:100px;
+    font-size:10px; font-family:'Orbitron',monospace; color:#fff; letter-spacing:.1em; white-space:nowrap;
+  }
+  .plan-card { position:relative; height:100%; }
+  .plan-price { font-size:48px; font-weight:900; font-family:'Orbitron',monospace; }
+  .plan-feature { display:flex; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid var(--border); font-size:13px; }
+
+  /* ── ANALYTICS ── */
+  .analytics-grid-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
+  @media(max-width:900px){ .analytics-grid-4 { grid-template-columns:repeat(2,1fr); } }
+
+  /* ── MEMORY VAULT ── */
+  .memory-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(360px,1fr)); gap:16px; }
+  @media(max-width:600px){ .memory-grid { grid-template-columns:1fr; } }
+
+  /* Emotion bars */
+  .emo-bar { display:flex; align-items:flex-end; gap:3px; height:70px; }
+  .emo-bar-item { flex:1; border-radius:2px 2px 0 0; background:linear-gradient(to top,var(--accent),var(--cyan)); }
+
+  /* ── API DOCS ── */
+  .endpoint-row { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--border); flex-wrap:wrap; }
+  .method-badge { font-size:10px; font-family:'Orbitron',monospace; padding:3px 8px; border-radius:4px; min-width:42px; text-align:center; }
+  .endpoint-path { font-size:13px; font-family:'Space Mono',monospace; min-width:220px; color:var(--text); }
+  .endpoint-desc { font-size:12px; color:var(--muted); }
+  pre { white-space:pre-wrap; word-break:break-word; }
+
+  /* ── FOOTER ── */
+  footer { border-top:1px solid var(--border); padding:32px 24px; }
+  .footer-inner { max-width:1200px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; }
+  .footer-logo { font-family:'Orbitron',monospace; font-size:14px; color:var(--muted); }
+  .footer-logo span { color:var(--accent); }
+  .footer-links { display:flex; gap:24px; }
+  .footer-link { font-size:12px; color:var(--muted); cursor:pointer; text-transform:capitalize; font-family:'Orbitron',monospace; transition:color .2s; }
+  .footer-link:hover { color:var(--accent); }
+
+  /* ── BG ORBS ── */
+  .orb { position:fixed; border-radius:50%; pointer-events:none; z-index:0; }
+  .orb1 { top:10%; left:5%; width:600px; height:600px; background:radial-gradient(circle,#6c63ff0f,transparent 70%); animation:orb1 12s ease-in-out infinite; }
+  .orb2 { bottom:10%; right:5%; width:500px; height:500px; background:radial-gradient(circle,#ff6b9d0a,transparent 70%); animation:orb2 16s ease-in-out infinite; }
+
+  /* Brainstorm ideas */
+  .ideas-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; }
+  .idea-num { font-size:10px; color:var(--muted); font-family:'Orbitron',monospace; margin-bottom:8px; }
+  .idea-name { font-size:16px; font-family:'Orbitron',monospace; margin-bottom:6px; }
+  .idea-tag { font-size:12px; font-style:italic; margin-bottom:8px; }
+  .idea-meta { font-size:11px; color:var(--muted); }
+
+  /* Loading spinner */
+  .spinner { width:18px; height:18px; border:2px solid #6c63ff44; border-top-color:var(--accent); border-radius:50%; animation:spin .7s linear infinite; display:inline-block; }
+
+  /* Section heading */
+  .section-heading { font-family:'Orbitron',monospace; font-size:28px; text-align:center; margin-bottom:48px; }
+  .section-sub { color:var(--muted); text-align:center; margin-top:6px; font-size:14px; }
+
+  /* Notification toast */
+  #toast {
+    position:fixed; bottom:24px; right:24px; z-index:9999;
+    background:#0f0f1e; border:1px solid var(--success); border-radius:8px;
+    padding:12px 20px; font-size:13px; color:var(--success); font-family:'Orbitron',monospace;
+    box-shadow:0 0 20px #00ff8844; display:none; animation:fadeUp .3s ease;
+  }
+
+  /* Mode tabs */
+  .mode-tabs { display:flex; gap:8px; }
+
+  /* Responsive helpers */
+  @media(max-width:600px){
+    .hero h1 { font-size:32px; }
+    .hero { padding:100px 16px 40px; }
+    .dash-grid-3 { grid-template-columns:1fr; }
+    .activity-type { display:none; }
+    .activity-time { display:none; }
+    .analytics-grid-4 { grid-template-columns:1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- BG Canvas -->
+<canvas id="particleCanvas" style="position:fixed;inset:0;z-index:0;opacity:.5;pointer-events:none;"></canvas>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<!-- Toast -->
+<div id="toast">✓ Copied to clipboard!</div>
+
+<!-- ═══════════════════════════════════════════════════════ NAV -->
+<nav id="navbar">
+  <div class="nav-inner">
+    <div class="logo" onclick="navigate('home')">
+      <div class="logo-icon">◈</div>
+      <span class="logo-text">Neuro<span>Narrate</span></span>
+    </div>
+    <div id="navLinks" class="nav-links" style="display:flex;gap:24px;align-items:center;">
+      <span class="nav-link active" data-page="home" onclick="navigate('home')">Home</span>
+      <span class="nav-link" data-page="generator" onclick="navigate('generator')">Generator</span>
+      <span class="nav-link" data-page="dashboard" onclick="navigate('dashboard')">Dashboard</span>
+      <span class="nav-link" data-page="memory" onclick="navigate('memory')">AI Memory</span>
+      <span class="nav-link" data-page="analytics" onclick="navigate('analytics')">Analytics</span>
+      <span class="nav-link" data-page="pricing" onclick="navigate('pricing')">Pricing</span>
+    </div>
+    <button class="btn btn-primary btn-sm" onclick="navigate('generator')">Launch ◈</button>
+    <button class="nav-mobile-btn" id="menuBtn" onclick="toggleMenu()">☰</button>
+  </div>
+</nav>
+<!-- Mobile nav -->
+<div id="mobileNav" style="display:none;flex-direction:column;position:fixed;top:64px;left:0;right:0;background:rgba(4,4,10,.98);padding:20px 24px;gap:16px;border-bottom:1px solid var(--border);z-index:999;">
+  <span class="nav-link" onclick="navigate('home');toggleMenu()">Home</span>
+  <span class="nav-link" onclick="navigate('generator');toggleMenu()">Generator</span>
+  <span class="nav-link" onclick="navigate('dashboard');toggleMenu()">Dashboard</span>
+  <span class="nav-link" onclick="navigate('memory');toggleMenu()">AI Memory</span>
+  <span class="nav-link" onclick="navigate('analytics');toggleMenu()">Analytics</span>
+  <span class="nav-link" onclick="navigate('pricing');toggleMenu()">Pricing</span>
+  <span class="nav-link" onclick="navigate('docs');toggleMenu()">API Docs</span>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ HOME -->
+<div id="page-home" class="page active" style="position:relative;z-index:1;">
+  <div class="hero">
+    <div class="badge badge-live" style="margin-bottom:32px;display:inline-flex;">
+      <span class="badge-dot"></span>
+      LIVE · THE FUTURE OF HUMAN EXPRESSION
+    </div>
+    <h1>
+      <span style="color:var(--text)">The AI that </span><br>
+      <span id="typewriter"></span><span class="cursor">|</span>
+    </h1>
+    <p>NeuroNarrate fuses emotion intelligence, psychological profiling, and viral mechanics to generate content that doesn't just read well — it <em style="color:var(--alt)">feels alive</em>.</p>
+    <div class="hero-btns">
+      <button class="btn btn-primary btn-lg" onclick="navigate('generator')">Launch Generator ◈</button>
+      <button class="btn btn-ghost btn-lg" onclick="navigate('dashboard')">View Dashboard ◉</button>
+    </div>
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="card stat-card">
+        <div class="stat-icon">✦</div>
+        <div class="stat-value" style="color:var(--accent);" data-target="2847" data-suffix="+">0</div>
+        <div class="stat-label">Pieces Generated</div>
+      </div>
+      <div class="card stat-card" style="border-color:#00e5ff22;">
+        <div class="stat-icon">◎</div>
+        <div class="stat-value" style="color:var(--cyan);" data-target="98" data-suffix="%">0</div>
+        <div class="stat-label">Human-Like Score</div>
+      </div>
+      <div class="card stat-card" style="border-color:#ff6b9d22;">
+        <div class="stat-icon">◇</div>
+        <div class="stat-value" style="color:var(--alt);" data-target="50" data-suffix="+">0</div>
+        <div class="stat-label">Languages</div>
+      </div>
+      <div class="card stat-card" style="border-color:#f5c84222;">
+        <div class="stat-icon">★</div>
+        <div class="stat-value" style="color:var(--gold);" data-target="140" data-suffix="K+">0</div>
+        <div class="stat-label">Active Creators</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature Grid -->
+  <div class="container" style="margin-top:80px;">
+    <h2 class="section-heading"><span style="color:var(--accent)">20</span> AI Engines. One Platform.</h2>
+    <div class="feature-grid">
+      <div class="card feature-card" style="border-color:#6c63ff22;">
+        <div class="feature-icon">🧠</div>
+        <div class="feature-title" style="color:var(--accent)">Emotion-Aware NLG</div>
+        <div class="feature-desc">Detects emotional subtext and adapts language patterns in real-time</div>
+      </div>
+      <div class="card feature-card" style="border-color:#ff6b9d22;">
+        <div class="feature-icon">🎭</div>
+        <div class="feature-title" style="color:var(--alt)">Tone Transformer</div>
+        <div class="feature-desc">Shift from boardroom formal to street-level casual in one click</div>
+      </div>
+      <div class="card feature-card" style="border-color:#00e5ff22;">
+        <div class="feature-icon">👻</div>
+        <div class="feature-title" style="color:var(--cyan)">Ghost Writer Mode</div>
+        <div class="feature-desc">Capture any writing style — from Hemingway to startup hustler</div>
+      </div>
+      <div class="card feature-card" style="border-color:#f5c84222;">
+        <div class="feature-icon">🌩️</div>
+        <div class="feature-title" style="color:var(--gold)">Brainstorm Storm</div>
+        <div class="feature-desc">8 startup-grade ideas from a single sentence in under 10 seconds</div>
+      </div>
+      <div class="card feature-card" style="border-color:#6c63ff22;">
+        <div class="feature-icon">🔮</div>
+        <div class="feature-title" style="color:var(--accent)">Future Predictor</div>
+        <div class="feature-desc">Viral probability scoring with audience behavior modeling</div>
+      </div>
+      <div class="card feature-card" style="border-color:#ff6b9d22;">
+        <div class="feature-icon">🤖</div>
+        <div class="feature-title" style="color:var(--alt)">AI Twin</div>
+        <div class="feature-desc">Builds a digital writing clone that evolves with every generation</div>
+      </div>
+      <div class="card feature-card" style="border-color:#00e5ff22;">
+        <div class="feature-icon">💥</div>
+        <div class="feature-title" style="color:var(--cyan)">Chaos Mode</div>
+        <div class="feature-desc">Intentional creative unpredictability for breakthrough ideas</div>
+      </div>
+      <div class="card feature-card" style="border-color:#f5c84222;">
+        <div class="feature-icon">📊</div>
+        <div class="feature-title" style="color:var(--gold)">Emotion Timeline</div>
+        <div class="feature-desc">Visual graph of emotional patterns across your writing history</div>
+      </div>
+      <div class="card feature-card" style="border-color:#6c63ff22;">
+        <div class="feature-icon">🌙</div>
+        <div class="feature-title" style="color:var(--accent)">Dream-to-Story</div>
+        <div class="feature-desc">Convert dream fragments into Hollywood-worthy cinematic scripts</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content Types -->
+  <div class="container" style="margin-top:80px;">
+    <h2 class="section-heading">Generate Anything. Instantly.</h2>
+    <div class="pill-row">
+      <div class="pill" onclick="navigate('generator')">✍️ Pro Blog</div>
+      <div class="pill" onclick="navigate('generator')">🚀 Startup Pitch</div>
+      <div class="pill" onclick="navigate('generator')">🎬 Cinematic Story</div>
+      <div class="pill" onclick="navigate('generator')">📧 Business Email</div>
+      <div class="pill" onclick="navigate('generator')">💼 LinkedIn Post</div>
+      <div class="pill" onclick="navigate('generator')">📣 Marketing Campaign</div>
+      <div class="pill" onclick="navigate('generator')">💭 Emotional Journal</div>
+      <div class="pill" onclick="navigate('generator')">🤖 Futuristic Script</div>
+      <div class="pill" onclick="navigate('generator')">⚡ AI Debate</div>
+      <div class="pill" onclick="navigate('generator')">🌩️ Brainstorm Storm</div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="container-sm" style="margin-top:80px;padding-bottom:80px;">
+    <div class="card card-alt" style="border-color:#ff6b9d22;text-align:center;padding:48px;">
+      <div style="font-size:40px;margin-bottom:16px;">⚡</div>
+      <h2 style="font-family:'Orbitron',monospace;font-size:26px;margin-bottom:16px;">Start Generating in <span style="color:var(--alt)">30 seconds</span></h2>
+      <p style="color:var(--muted);margin-bottom:32px;line-height:1.7;">No credit card. No setup. Just your thoughts — and our AI's ability to make them extraordinary.</p>
+      <button class="btn btn-secondary btn-lg" onclick="navigate('generator')">Try Free — No Signup Required</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ GENERATOR -->
+<div id="page-generator" class="page" style="position:relative;z-index:1;">
+  <div class="container" style="padding-top:32px;padding-bottom:60px;">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;flex-wrap:wrap;gap:16px;">
+      <div>
+        <h1 style="font-family:'Orbitron',monospace;font-size:30px;">AI Generator</h1>
+        <p style="color:var(--muted);margin-top:4px;font-size:14px;">Configure your neural engine and generate extraordinary content</p>
+      </div>
+      <div class="mode-tabs">
+        <button class="btn btn-primary btn-sm" id="tabGen" onclick="switchMode('generate')">◈ Generate</button>
+        <button class="btn btn-ghost btn-sm" id="tabStorm" onclick="switchMode('brainstorm')">🌩️ Brainstorm</button>
+      </div>
+    </div>
+
+    <!-- GENERATE MODE -->
+    <div id="genMode">
+      <div class="gen-grid">
+        <!-- LEFT CONTROLS -->
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <!-- Content Type -->
+          <div class="card">
+            <span class="section-label">Content Type</span>
+            <div class="content-type-list" id="ctList"></div>
+          </div>
+          <!-- Tone / Emotion / Personality -->
+          <div class="card">
+            <span class="section-label">Tone</span>
+            <div class="chips" id="toneChips"></div>
+            <span class="section-label">Emotion Core</span>
+            <div class="chips" id="emotionChips"></div>
+            <span class="section-label">Personality</span>
+            <div class="chips" id="personalityChips"></div>
+          </div>
+          <!-- Creativity + Chaos -->
+          <div class="card">
+            <span class="section-label">Creativity Dial — <span id="creativityVal">7</span>/10</span>
+            <div class="slider-wrap">
+              <input type="range" min="1" max="10" value="7" id="creativitySlider" oninput="document.getElementById('creativityVal').textContent=this.value">
+              <div class="slider-labels"><span>Conservative</span><span>Chaotic Genius</span></div>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle" id="chaosToggle" onclick="toggleChaos()"><div class="toggle-knob"></div></div>
+              <span class="toggle-label" id="chaosLabel">💥 Chaos Mode</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT EDITOR -->
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <div class="card">
+            <span class="section-label">Your Prompt</span>
+            <textarea id="promptInput" rows="6" placeholder="Type anything — a thought, a feeling, a rough idea, a dream... The AI will transform it into something extraordinary."></textarea>
+            <div style="margin-top:10px;">
+              <input type="text" id="audienceInput" placeholder="Target audience (optional — e.g. 'Gen Z startup founders', 'Fortune 500 CEOs')" />
+            </div>
+            <div style="margin-top:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+              <button class="btn btn-primary btn-md" id="generateBtn" onclick="handleGenerate()">◈ Generate Content</button>
+              <button class="btn btn-ghost btn-sm" id="copyBtn" onclick="copyOutput()" style="display:none;">⧉ Copy</button>
+              <span id="wordCount" style="font-size:12px;color:var(--muted);"></span>
+            </div>
+          </div>
+
+          <!-- Output -->
+          <div class="card card-cyan" id="outputCard" style="display:none;border-color:#00e5ff22;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+              <span class="section-label" style="color:var(--cyan);margin:0;">Generated Output</span>
+              <div id="outputBadges" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+            </div>
+            <div id="outputSkeleton" style="display:none;">
+              <div class="skeleton" style="width:100%"></div>
+              <div class="skeleton" style="width:90%"></div>
+              <div class="skeleton" style="width:85%"></div>
+              <div class="skeleton" style="width:70%"></div>
+              <div class="skeleton" style="width:95%"></div>
+            </div>
+            <div id="outputText" style="color:var(--text);line-height:1.8;white-space:pre-wrap;font-size:14px;"></div>
+          </div>
+
+          <!-- Analysis -->
+          <div class="card card-gold" id="analysisCard" style="display:none;border-color:#f5c84222;">
+            <span class="section-label" style="color:var(--gold);">🔬 Content Intelligence Analysis</span>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:16px 0;" id="analysisMetrics"></div>
+            <div id="psychInsight" style="padding:12px;background:rgba(0,0,0,.3);border-radius:8px;font-size:13px;color:var(--muted);font-style:italic;line-height:1.6;"></div>
+            <div id="subEmotions" style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BRAINSTORM MODE -->
+    <div id="stormMode" style="display:none;">
+      <div class="card card-gold" style="margin-bottom:24px;border-color:#f5c84222;">
+        <h3 style="font-family:'Orbitron',monospace;color:var(--gold);margin-bottom:12px;">🌩️ Brainstorm Storm Mode</h3>
+        <p style="color:var(--muted);margin-bottom:16px;font-size:14px;">Type one sentence. Get 8 startup-grade breakthrough ideas in seconds.</p>
+        <textarea id="stormInput" rows="3" placeholder="e.g. 'AI that reads emotions from text and adapts communication style...'"></textarea>
+        <div style="margin-top:16px;">
+          <button class="btn btn-gold btn-md" id="stormBtn" onclick="handleBrainstorm()">⚡ Ignite Storm</button>
+        </div>
+      </div>
+      <div class="ideas-grid" id="ideasGrid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ DASHBOARD -->
+<div id="page-dashboard" class="page" style="position:relative;z-index:1;">
+  <div class="container" style="padding-top:32px;padding-bottom:60px;">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;flex-wrap:wrap;gap:16px;">
+      <div>
+        <h1 style="font-family:'Orbitron',monospace;font-size:30px;">Mission Control</h1>
+        <p style="color:var(--muted);margin-top:4px;font-size:14px;">Your AI content intelligence dashboard</p>
+      </div>
+      <button class="btn btn-primary btn-md" onclick="navigate('generator')">+ New Generation</button>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="dash-grid-4" style="margin-bottom:24px;">
+      <div class="card stat-card"><div class="stat-icon">◈</div><div class="stat-value" style="color:var(--accent)">2,847</div><div class="stat-label">Total Generations</div></div>
+      <div class="card stat-card" style="border-color:#00e5ff22;"><div class="stat-icon">🔮</div><div class="stat-value" style="color:var(--cyan)">94%</div><div class="stat-label">Avg Viral Score</div></div>
+      <div class="card stat-card" style="border-color:#ff6b9d22;"><div class="stat-icon">✦</div><div class="stat-value" style="color:var(--alt)">1.2M</div><div class="stat-label">Words Generated</div></div>
+      <div class="card stat-card" style="border-color:#f5c84222;"><div class="stat-icon">◇</div><div class="stat-value" style="color:var(--gold)">18</div><div class="stat-label">Languages Used</div></div>
+    </div>
+
+    <!-- Sparklines -->
+    <div class="dash-grid-3" style="margin-bottom:24px;">
+      <div class="card"><div style="display:flex;justify-content:space-between;margin-bottom:12px;"><span style="font-size:11px;color:var(--muted);font-family:'Orbitron',monospace;">Daily Generations</span><span style="font-size:11px;color:var(--success);font-family:'Orbitron',monospace;">↑ 24%</span></div><svg width="100%" height="50" viewBox="0 0 200 50" preserveAspectRatio="none"><polyline points="0,42 18,34 36,38 55,27 73,15 91,18 109,9 127,4 145,8 163,0 181,2 200,0" fill="none" stroke="#6c63ff" stroke-width="2" stroke-linejoin="round"/><polygon points="0,50 0,42 18,34 36,38 55,27 73,15 91,18 109,9 127,4 145,8 163,0 181,2 200,0 200,50" fill="#6c63ff22"/></svg></div>
+      <div class="card" style="border-color:#00e5ff22;"><div style="display:flex;justify-content:space-between;margin-bottom:12px;"><span style="font-size:11px;color:var(--muted);font-family:'Orbitron',monospace;">Avg Viral Score</span><span style="font-size:11px;color:var(--success);font-family:'Orbitron',monospace;">↑ 12%</span></div><svg width="100%" height="50" viewBox="0 0 200 50" preserveAspectRatio="none"><polyline points="0,28 18,22 36,25 55,19 73,12 91,6 109,10 127,4 145,8 163,2 181,6 200,0" fill="none" stroke="#00e5ff" stroke-width="2" stroke-linejoin="round"/><polygon points="0,50 0,28 18,22 36,25 55,19 73,12 91,6 109,10 127,4 145,8 163,2 181,6 200,0 200,50" fill="#00e5ff22"/></svg></div>
+      <div class="card" style="border-color:#ff6b9d22;"><div style="display:flex;justify-content:space-between;margin-bottom:12px;"><span style="font-size:11px;color:var(--muted);font-family:'Orbitron',monospace;">Words Produced</span><span style="font-size:11px;color:var(--success);font-family:'Orbitron',monospace;">↑ 38%</span></div><svg width="100%" height="50" viewBox="0 0 200 50" preserveAspectRatio="none"><polyline points="0,38 18,30 36,34 55,20 73,12 91,16 109,6 127,2 145,6 163,0 181,4 200,0" fill="none" stroke="#ff6b9d" stroke-width="2" stroke-linejoin="round"/><polygon points="0,50 0,38 18,30 36,34 55,20 73,12 91,16 109,6 127,2 145,6 163,0 181,4 200,0 200,50" fill="#ff6b9d22"/></svg></div>
+    </div>
+
+    <!-- DNA + Emotions -->
+    <div class="dash-grid-2" style="margin-bottom:24px;">
+      <div class="card">
+        <h3 style="font-family:'Orbitron',monospace;font-size:13px;color:var(--accent);margin-bottom:16px;">🧠 AI Writing DNA</h3>
+        <div id="dnaMetrics"></div>
+      </div>
+      <div class="card" style="border-color:#ff6b9d22;">
+        <h3 style="font-family:'Orbitron',monospace;font-size:13px;color:var(--alt);margin-bottom:16px;">🎭 Emotion Distribution</h3>
+        <div id="emotionDist"></div>
+      </div>
+    </div>
+
+    <!-- Activity -->
+    <div class="card">
+      <h3 style="font-family:'Orbitron',monospace;font-size:13px;color:var(--text);margin-bottom:20px;">⚡ Recent Generations</h3>
+      <div style="display:flex;flex-direction:column;gap:10px;" id="activityList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ MEMORY -->
+<div id="page-memory" class="page" style="position:relative;z-index:1;">
+  <div class="container-sm" style="padding-top:32px;padding-bottom:60px;">
+    <div style="text-align:center;margin-bottom:40px;">
+      <div style="font-size:48px;margin-bottom:16px;">◎</div>
+      <h1 style="font-family:'Orbitron',monospace;font-size:30px;margin-bottom:8px;">AI Memory Vault</h1>
+      <p style="color:var(--muted);">Your evolving digital writing DNA — learned from every generation</p>
+    </div>
+
+    <div class="card" style="margin-bottom:24px;padding:18px 24px;">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--alt));display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">🤖</div>
+        <div style="flex:1;">
+          <div style="font-family:'Orbitron',monospace;font-size:13px;">AI Twin Status: <span style="color:var(--success)">Active & Learning</span></div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px;">2,847 generations analyzed · Last updated: just now</div>
+        </div>
+        <button class="btn btn-ghost btn-sm">⟳ Recalibrate</button>
+      </div>
+    </div>
+
+    <div class="memory-grid" style="margin-bottom:24px;">
+      <div class="card" style="border-color:#6c63ff22;">
+        <div style="font-size:10px;color:var(--accent);letter-spacing:.15em;font-family:'Orbitron',monospace;margin-bottom:8px;">STYLE MEMORY</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:6px;">Writing Style</div>
+        <div style="font-size:14px;line-height:1.5;">Analytical + Emotional fusion — structured yet deeply human</div>
+      </div>
+      <div class="card" style="border-color:#ff6b9d22;">
+        <div style="font-size:10px;color:var(--alt);letter-spacing:.15em;font-family:'Orbitron',monospace;margin-bottom:8px;">EMOTION MEMORY</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:6px;">Dominant Emotion</div>
+        <div style="font-size:14px;line-height:1.5;">Confidence with undertones of urgency and vision</div>
+      </div>
+      <div class="card" style="border-color:#00e5ff22;">
+        <div style="font-size:10px;color:var(--cyan);letter-spacing:.15em;font-family:'Orbitron',monospace;margin-bottom:8px;">AUDIENCE MEMORY</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:6px;">Primary Audience</div>
+        <div style="font-size:14px;line-height:1.5;">Early-stage founders, tech innovators, creative professionals</div>
+      </div>
+      <div class="card" style="border-color:#f5c84222;">
+        <div style="font-size:10px;color:var(--gold);letter-spacing:.15em;font-family:'Orbitron',monospace;margin-bottom:8px;">TONE MEMORY</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:6px;">Tone Preference</div>
+        <div style="font-size:14px;line-height:1.5;">Inspirational with sharp strategic precision</div>
+      </div>
+      <div class="card" style="border-color:#00ff8822;">
+        <div style="font-size:10px;color:var(--success);letter-spacing:.15em;font-family:'Orbitron',monospace;margin-bottom:8px;">LANGUAGE MEMORY</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:6px;">Vocabulary Level</div>
+        <div style="font-size:14px;line-height:1.5;">Advanced — prefers uncommon precise words over generic</div>
+      </div>
+      <div class="card" style="border-color:#6c63ff22;">
+        <div style="font-size:10px;color:var(--accent);letter-spacing:.15em;font-family:'Orbitron',monospace;margin-bottom:8px;">TWIN MEMORY</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:6px;">AI Personality Twin</div>
+        <div style="font-size:14px;line-height:1.5;">The Visionary Rebel — challenges convention, builds futures</div>
+      </div>
+    </div>
+
+    <!-- Emotion Timeline -->
+    <div class="card card-gold" style="border-color:#f5c84222;">
+      <h3 style="font-family:'Orbitron',monospace;font-size:13px;color:var(--gold);margin-bottom:16px;">📊 Emotion Timeline — Last 30 Days</h3>
+      <div class="emo-bar" id="emoTimeline"></div>
+      <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:var(--muted);">
+        <span>30 days ago</span><span>Today</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ ANALYTICS -->
+<div id="page-analytics" class="page" style="position:relative;z-index:1;">
+  <div class="container" style="padding-top:32px;padding-bottom:60px;">
+    <h1 style="font-family:'Orbitron',monospace;font-size:30px;margin-bottom:6px;">Content Analytics</h1>
+    <p style="color:var(--muted);margin-bottom:40px;font-size:14px;">Deep intelligence on your content performance and viral predictions</p>
+
+    <div class="analytics-grid-4" style="margin-bottom:32px;">
+      <div class="card stat-card" style="border-color:#00e5ff22;"><div class="stat-icon">🔮</div><div class="stat-value" style="color:var(--cyan)">94%</div><div class="stat-label">Avg Virality Score</div></div>
+      <div class="card stat-card"><div class="stat-icon">◎</div><div class="stat-value" style="color:var(--accent)">87%</div><div class="stat-label">Human-Score Rating</div></div>
+      <div class="card stat-card" style="border-color:#ff6b9d22;"><div class="stat-icon">⚡</div><div class="stat-value" style="color:var(--alt)">3.2x</div><div class="stat-label">Engagement Multiplier</div></div>
+      <div class="card stat-card" style="border-color:#f5c84222;"><div class="stat-icon">◇</div><div class="stat-value" style="color:var(--gold)">72%</div><div class="stat-label">SEO Rank Improvement</div></div>
+    </div>
+
+    <div class="dash-grid-2">
+      <div class="card">
+        <h3 style="font-family:'Orbitron',monospace;font-size:13px;color:var(--accent);margin-bottom:20px;">📈 Viral Prediction Accuracy</h3>
+        <div style="display:flex;flex-direction:column;gap:12px;" id="viralAccuracy"></div>
+      </div>
+      <div class="card" style="border-color:#ff6b9d22;">
+        <h3 style="font-family:'Orbitron',monospace;font-size:13px;color:var(--alt);margin-bottom:20px;">🌍 Top Content Categories</h3>
+        <div id="contentCategories"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ PRICING -->
+<div id="page-pricing" class="page" style="position:relative;z-index:1;">
+  <div class="container" style="padding-top:32px;padding-bottom:60px;text-align:center;">
+    <h1 style="font-family:'Orbitron',monospace;font-size:38px;margin-bottom:12px;">Power Up Your <span style="color:var(--accent)">Creativity</span></h1>
+    <p style="color:var(--muted);margin-bottom:60px;font-size:15px;">Simple, transparent pricing. No hidden fees. Cancel anytime.</p>
+    <div class="pricing-grid">
+      <!-- Spark -->
+      <div style="position:relative;">
+        <div class="card" style="height:100%;text-align:left;">
+          <div style="font-family:'Orbitron',monospace;font-size:18px;color:var(--muted);margin-bottom:4px;">Spark</div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:24px;">For curious minds</div>
+          <div class="plan-price">Free</div>
+          <div style="margin:24px 0;">
+            <div class="plan-feature"><span style="color:var(--muted)">✓</span> 50 generations/month</div>
+            <div class="plan-feature"><span style="color:var(--muted)">✓</span> 5 content types</div>
+            <div class="plan-feature"><span style="color:var(--muted)">✓</span> Basic emotion detection</div>
+            <div class="plan-feature"><span style="color:var(--muted)">✓</span> Standard outputs</div>
+          </div>
+          <button class="btn btn-ghost btn-md" onclick="navigate('generator')" style="width:100%;">Start Free</button>
+        </div>
+      </div>
+      <!-- Neural -->
+      <div style="position:relative;">
+        <div class="popular-badge">MOST POPULAR</div>
+        <div class="card" style="height:100%;text-align:left;border-color:#6c63ff44;">
+          <div style="font-family:'Orbitron',monospace;font-size:18px;color:var(--accent);margin-bottom:4px;">Neural</div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:24px;">For serious creators</div>
+          <div class="plan-price" style="color:var(--text);">$29</div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:24px;">/month</div>
+          <div style="margin-bottom:24px;">
+            <div class="plan-feature"><span style="color:var(--accent)">✓</span> Unlimited generations</div>
+            <div class="plan-feature"><span style="color:var(--accent)">✓</span> All 10 content types</div>
+            <div class="plan-feature"><span style="color:var(--accent)">✓</span> Full emotion engine</div>
+            <div class="plan-feature"><span style="color:var(--accent)">✓</span> Viral predictor</div>
+            <div class="plan-feature"><span style="color:var(--accent)">✓</span> AI Twin</div>
+            <div class="plan-feature"><span style="color:var(--accent)">✓</span> Multi-language</div>
+            <div class="plan-feature"><span style="color:var(--accent)">✓</span> Priority processing</div>
+          </div>
+          <button class="btn btn-primary btn-md" onclick="navigate('generator')" style="width:100%;">Get Started</button>
+        </div>
+      </div>
+      <!-- Nexus -->
+      <div style="position:relative;">
+        <div class="card" style="height:100%;text-align:left;border-color:#f5c84222;">
+          <div style="font-family:'Orbitron',monospace;font-size:18px;color:var(--gold);margin-bottom:4px;">Nexus</div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:24px;">For teams &amp; agencies</div>
+          <div class="plan-price" style="color:var(--text);">$99</div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:24px;">/month</div>
+          <div style="margin-bottom:24px;">
+            <div class="plan-feature"><span style="color:var(--gold)">✓</span> Everything in Neural</div>
+            <div class="plan-feature"><span style="color:var(--gold)">✓</span> Team collaboration</div>
+            <div class="plan-feature"><span style="color:var(--gold)">✓</span> API access</div>
+            <div class="plan-feature"><span style="color:var(--gold)">✓</span> White-label</div>
+            <div class="plan-feature"><span style="color:var(--gold)">✓</span> Brainstorm Storm</div>
+            <div class="plan-feature"><span style="color:var(--gold)">✓</span> Custom AI training</div>
+            <div class="plan-feature"><span style="color:var(--gold)">✓</span> Analytics dashboard</div>
+            <div class="plan-feature"><span style="color:var(--gold)">✓</span> Dedicated AI model</div>
+          </div>
+          <button class="btn btn-gold btn-md" onclick="navigate('generator')" style="width:100%;">Get Started</button>
+        </div>
+      </div>
+    </div>
+    <!-- Monetization -->
+    <div class="card card-gold" style="margin-top:48px;text-align:left;border-color:#f5c84222;max-width:700px;margin-left:auto;margin-right:auto;">
+      <h3 style="font-family:'Orbitron',monospace;font-size:18px;color:var(--gold);margin-bottom:12px;">💡 Monetization Philosophy</h3>
+      <p style="color:var(--muted);line-height:1.7;font-size:14px;">NeuroNarrate is built on a freemium + usage model. Free tier creates habit. Neural subscription captures creators. Nexus API access targets enterprises and B2B integrations — the real revenue engine. API docs, white-label, and custom AI training are the $1M+ ARR pathway.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ DOCS -->
+<div id="page-docs" class="page" style="position:relative;z-index:1;">
+  <div class="container-sm" style="padding-top:32px;padding-bottom:60px;">
+    <h1 style="font-family:'Orbitron',monospace;font-size:30px;margin-bottom:8px;">API Documentation</h1>
+    <p style="color:var(--muted);margin-bottom:40px;">Integrate NeuroNarrate's AI engine into your own products</p>
+
+    <div class="card card-cyan" style="border-color:#00e5ff22;margin-bottom:24px;">
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
+        <span style="font-size:11px;color:var(--cyan);font-family:'Orbitron',monospace;">BASE URL</span>
+        <code style="background:rgba(0,0,0,.4);padding:6px 14px;border-radius:6px;color:var(--cyan);font-size:13px;font-family:'Space Mono',monospace;">https://api.neuronarrate.ai</code>
+      </div>
+      <p style="font-size:13px;color:var(--muted);">All requests require <code style="color:var(--accent)">Authorization: Bearer YOUR_API_KEY</code> header.</p>
+    </div>
+
+    <div class="card" style="margin-bottom:24px;">
+      <h3 style="font-family:'Orbitron',monospace;font-size:13px;color:var(--accent);margin-bottom:16px;">⚡ Endpoints</h3>
+      <div class="endpoint-row"><span class="method-badge" style="background:#00ff8822;color:var(--success)">POST</span><code class="endpoint-path">/v1/generate</code><span class="endpoint-desc">Generate content with full emotion + tone control</span></div>
+      <div class="endpoint-row"><span class="method-badge" style="background:#00e5ff22;color:var(--cyan)">POST</span><code class="endpoint-path">/v1/analyze</code><span class="endpoint-desc">Emotion &amp; viral analysis on any text</span></div>
+      <div class="endpoint-row"><span class="method-badge" style="background:#f5c84222;color:var(--gold)">POST</span><code class="endpoint-path">/v1/brainstorm</code><span class="endpoint-desc">Generate startup ideas from a seed prompt</span></div>
+      <div class="endpoint-row"><span class="method-badge" style="background:#6c63ff22;color:var(--accent)">GET</span><code class="endpoint-path">/v1/memory/:userId</code><span class="endpoint-desc">Retrieve user AI memory profile</span></div>
+      <div class="endpoint-row"><span class="method-badge" style="background:#ff6b9d22;color:var(--alt)">PUT</span><code class="endpoint-path">/v1/memory/:userId</code><span class="endpoint-desc">Update user personality twin data</span></div>
+      <div class="endpoint-row"><span class="method-badge" style="background:#6c63ff22;color:var(--accent)">GET</span><code class="endpoint-path">/v1/analytics/:userId</code><span class="endpoint-desc">Full content analytics for a user</span></div>
+    </div>
+
+    <div class="card card-gold" style="border-color:#f5c84222;">
+      <h3 style="font-family:'Orbitron',monospace;font-size:13px;color:var(--gold);margin-bottom:16px;">📋 Sample Request — POST /v1/generate</h3>
+      <pre style="background:rgba(0,0,0,.5);padding:20px;border-radius:8px;color:var(--cyan);font-size:13px;font-family:'Space Mono',monospace;line-height:1.7;overflow-x:auto;">{
+  "prompt": "The future of remote work",
+  "contentType": "blog",
+  "tone": "Inspirational",
+  "emotion": "Confident",
+  "personality": "Visionary",
+  "creativity": 8,
+  "audience": "Tech startup founders",
+  "chaosMode": false
+}</pre>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ FOOTER -->
+<footer style="position:relative;z-index:1;">
+  <div class="footer-inner">
+    <div class="footer-logo">Neuro<span>Narrate</span> AI · The Future of Human Expression</div>
+    <div class="footer-links">
+      <span class="footer-link" onclick="navigate('docs')">Docs</span>
+      <span class="footer-link" onclick="navigate('pricing')">Pricing</span>
+      <span class="footer-link" onclick="navigate('analytics')">Analytics</span>
+    </div>
+    <div style="font-size:12px;color:var(--muted);">Built for the next generation of creators</div>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════════════════════ SCRIPTS -->
+<script>
+// ── STATE ──────────────────────────────────────────────────────────────────────
+const STATE = {
+  page: 'home',
+  mode: 'generate',
+  contentType: 'blog',
+  tone: 'Professional',
+  emotion: 'Confident',
+  personality: 'Visionary',
+  creativity: 7,
+  chaos: false,
+};
+
+const CONTENT_TYPES = [
+  { id:'blog',      label:'Pro Blog',          icon:'✍️',  desc:'SEO-optimized thought leadership' },
+  { id:'pitch',     label:'Startup Pitch',     icon:'🚀',  desc:'Investor-ready narratives' },
+  { id:'story',     label:'Cinematic Story',   icon:'🎬',  desc:'Hollywood-grade storytelling' },
+  { id:'email',     label:'Business Email',    icon:'📧',  desc:'High-conversion copy' },
+  { id:'linkedin',  label:'LinkedIn Post',     icon:'💼',  desc:'Viral professional content' },
+  { id:'campaign',  label:'Marketing Campaign',icon:'📣',  desc:'Multi-channel strategy' },
+];
+const TONES = ['Professional','Casual','Inspirational','Aggressive','Empathetic','Chaotic'];
+const EMOTIONS = ['Excited','Confident','Anxious','Melancholic','Angry','Joyful','Neutral'];
+const PERSONALITIES = ['Visionary','Analyst','Storyteller','Rebel','Diplomat','Creator'];
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────────
+function navigate(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page)?.classList.add('active');
+  document.querySelectorAll('.nav-link').forEach(l => {
+    l.classList.toggle('active', l.dataset.page === page);
+  });
+  STATE.page = page;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (page === 'dashboard') initDashboard();
+  if (page === 'analytics') initAnalytics();
+  if (page === 'memory') initMemory();
+}
+
+function toggleMenu() {
+  const m = document.getElementById('mobileNav');
+  m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
+  m.style.flexDirection = 'column';
+}
+
+// Nav scroll effect
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20);
+});
+
+// ── PARTICLE CANVAS ───────────────────────────────────────────────────────────
+(function initParticles() {
+  const canvas = document.getElementById('particleCanvas');
+  const ctx = canvas.getContext('2d');
+  let W = canvas.width = window.innerWidth;
+  let H = canvas.height = window.innerHeight;
+  const COLS = ['#6c63ff','#ff6b9d','#00e5ff'];
+  const particles = Array.from({length:80}, () => ({
+    x: Math.random()*W, y: Math.random()*H,
+    vx:(Math.random()-.5)*.4, vy:(Math.random()-.5)*.4,
+    r:Math.random()*2+.5,
+    color:COLS[Math.floor(Math.random()*3)],
+    alpha:Math.random()*.6+.1,
+  }));
+  function draw() {
+    ctx.clearRect(0,0,W,H);
+    particles.forEach(p => {
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x<0)p.x=W; if(p.x>W)p.x=0;
+      if(p.y<0)p.y=H; if(p.y>H)p.y=0;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=p.color+Math.round(p.alpha*255).toString(16).padStart(2,'0');
+      ctx.fill();
+    });
+    for(let i=0;i<particles.length;i++) {
+      for(let j=i+1;j<particles.length;j++) {
+        const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y;
+        const d=Math.sqrt(dx*dx+dy*dy);
+        if(d<120){
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x,particles[i].y);
+          ctx.lineTo(particles[j].x,particles[j].y);
+          ctx.strokeStyle='#6c63ff'+Math.round((1-d/120)*40).toString(16).padStart(2,'0');
+          ctx.lineWidth=.5; ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+  window.addEventListener('resize',()=>{W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;});
+})();
+
+// ── TYPEWRITER ────────────────────────────────────────────────────────────────
+(function initTypewriter() {
+  const phrases = [
+    'transforms thoughts into masterpieces',
+    'reads your emotional frequency',
+    'writes like your digital twin',
+    'predicts viral before it happens',
+    'speaks 50+ languages fluently',
+  ];
+  const el = document.getElementById('typewriter');
+  let pIdx=0, cIdx=0, deleting=false;
+  function tick() {
+    const cur = phrases[pIdx];
+    if(!deleting){
+      if(cIdx<cur.length){ el.textContent=cur.slice(0,++cIdx); setTimeout(tick,60); }
+      else setTimeout(()=>{deleting=true;tick();},1800);
+    } else {
+      if(cIdx>0){ el.textContent=cur.slice(0,--cIdx); setTimeout(tick,30); }
+      else{ deleting=false; pIdx=(pIdx+1)%phrases.length; setTimeout(tick,60); }
+    }
+  }
+  tick();
+})();
+
+// ── COUNT UP STATS ────────────────────────────────────────────────────────────
+function countUp() {
+  document.querySelectorAll('[data-target]').forEach(el => {
+    const target = parseFloat(el.dataset.target);
+    const suffix = el.dataset.suffix || '';
+    let cur = 0; const step = target/40;
+    const t = setInterval(()=>{
+      cur+=step;
+      if(cur>=target){ el.textContent=target+suffix; clearInterval(t); }
+      else el.textContent=Math.floor(cur)+suffix;
+    },30);
+  });
+}
+setTimeout(countUp, 800);
+
+// ── GENERATOR BUILD ───────────────────────────────────────────────────────────
+function buildContentTypeList() {
+  const el = document.getElementById('ctList');
+  el.innerHTML = CONTENT_TYPES.map(ct => `
+    <div class="ct-item ${STATE.contentType===ct.id?'active':''}" onclick="selectCT('${ct.id}')" id="ct-${ct.id}">
+      <span style="font-size:18px">${ct.icon}</span>
+      <div><div class="ct-name">${ct.label}</div><div class="ct-desc">${ct.desc}</div></div>
+    </div>`).join('');
+}
+function selectCT(id) {
+  STATE.contentType = id;
+  document.querySelectorAll('.ct-item').forEach(el => {
+    el.classList.toggle('active', el.id === 'ct-'+id);
+    el.querySelector('.ct-name').style.color = el.id==='ct-'+id ? 'var(--accent)' : '';
+  });
+}
+
+function buildChips(ids, current, type) {
+  const el = document.getElementById(ids);
+  const activeClass = {tone:'active-tone',emotion:'active-emotion',personality:'active-personality'}[type];
+  const items = {tone:TONES,emotion:EMOTIONS,personality:PERSONALITIES}[type];
+  el.innerHTML = items.map(v => `
+    <div class="chip ${STATE[type]===v?activeClass:''}" onclick="selectChip('${type}','${v}','${ids}','${activeClass}')">${v}</div>`).join('');
+}
+function selectChip(type, val, containerId, activeClass) {
+  STATE[type] = val;
+  document.querySelectorAll(`#${containerId} .chip`).forEach(c => {
+    c.className = 'chip' + (c.textContent===val ? ' '+activeClass : '');
+  });
+}
+
+function toggleChaos() {
+  STATE.chaos = !STATE.chaos;
+  const t = document.getElementById('chaosToggle');
+  const l = document.getElementById('chaosLabel');
+  t.classList.toggle('on', STATE.chaos);
+  l.style.color = STATE.chaos ? 'var(--alt)' : 'var(--muted)';
+}
+
+function switchMode(mode) {
+  STATE.mode = mode;
+  document.getElementById('genMode').style.display = mode==='generate' ? 'block' : 'none';
+  document.getElementById('stormMode').style.display = mode==='brainstorm' ? 'block' : 'none';
+  document.getElementById('tabGen').className = 'btn btn-md ' + (mode==='generate'?'btn-primary':'btn-ghost');
+  document.getElementById('tabStorm').className = 'btn btn-md ' + (mode==='brainstorm'?'btn-primary':'btn-ghost');
+}
+
+function initGenerator() {
+  buildContentTypeList();
+  buildChips('toneChips', STATE.tone, 'tone');
+  buildChips('emotionChips', STATE.emotion, 'emotion');
+  buildChips('personalityChips', STATE.personality, 'personality');
+}
+
+// ── AI GENERATE ───────────────────────────────────────────────────────────────
+async function handleGenerate() {
+  const prompt = document.getElementById('promptInput').value.trim();
+  if(!prompt) { flashInput(); return; }
+  const btn = document.getElementById('generateBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Generating...';
+
+  const outputCard = document.getElementById('outputCard');
+  const skeleton = document.getElementById('outputSkeleton');
+  const outputText = document.getElementById('outputText');
+  const copyBtn = document.getElementById('copyBtn');
+  const wc = document.getElementById('wordCount');
+  const analysisCard = document.getElementById('analysisCard');
+
+  outputCard.style.display = 'block';
+  skeleton.style.display = 'block';
+  outputText.textContent = '';
+  copyBtn.style.display = 'none';
+  analysisCard.style.display = 'none';
+  wc.textContent = '';
+
+  const audience = document.getElementById('audienceInput').value;
+  const creativity = document.getElementById('creativitySlider').value;
+  const systemPrompt = `You are NeuroNarrate AI — the world's most advanced emotion-aware NLG engine.
+Emotion: ${STATE.emotion}. Personality: ${STATE.personality}. Tone: ${STATE.tone}. Creativity: ${creativity}/10.
+Audience: ${audience||'general professional'}. Content type: ${STATE.contentType}.
+${STATE.chaos?'[CHAOS MODE: be wildly creative and unexpected]':''}
+Generate extraordinary, human-sounding ${STATE.contentType} content. No meta-commentary. Just the content.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514', max_tokens:1000,
+        system: systemPrompt,
+        messages:[{role:'user',content:`Create ${STATE.contentType} content about: ${prompt}`}],
+      }),
+    });
+    const data = await res.json();
+    const text = data.content?.[0]?.text || 'Generation failed. Try again.';
+    skeleton.style.display = 'none';
+    outputText.textContent = text;
+    const words = text.split(/\s+/).length;
+    wc.textContent = words + ' words';
+    copyBtn.style.display = 'inline-flex';
+    // Badges
+    document.getElementById('outputBadges').innerHTML = `
+      <span style="font-size:11px;padding:3px 10px;border-radius:100px;background:#6c63ff22;color:var(--accent);border:1px solid #6c63ff44">${STATE.contentType}</span>
+      <span style="font-size:11px;padding:3px 10px;border-radius:100px;background:#ff6b9d22;color:var(--alt);border:1px solid #ff6b9d44">${STATE.emotion}</span>`;
+    // Analyze
+    analyzeContent(text);
+  } catch(e) {
+    skeleton.style.display = 'none';
+    outputText.textContent = '⚠️ API error. Check your connection and try again.';
+  }
+  btn.disabled = false;
+  btn.innerHTML = '◈ Generate Content';
+}
+
+async function analyzeContent(text) {
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514', max_tokens:1000,
+        system:'Analyze text. Return ONLY pure JSON (no markdown, no backticks): {"emotion":string,"virality":number,"readabilityScore":number,"subEmotions":string[],"psychologicalInsight":string}',
+        messages:[{role:'user',content:text}],
+      }),
+    });
+    const data = await res.json();
+    let analysis;
+    try { analysis = JSON.parse((data.content?.[0]?.text||'{}').replace(/```json|```/g,'').trim()); }
+    catch { analysis = {emotion:'Confident',virality:78,readabilityScore:82,subEmotions:['focused','assertive'],psychologicalInsight:'Strong professional tone with clear authority signals.'}; }
+    
+    const card = document.getElementById('analysisCard');
+    card.style.display = 'block';
+    document.getElementById('analysisMetrics').innerHTML = `
+      <div style="text-align:center"><div style="font-size:22px;font-weight:800;color:var(--alt);font-family:'Orbitron',monospace">${analysis.emotion||'—'}</div><div style="font-size:11px;color:var(--muted)">Emotion</div></div>
+      <div style="text-align:center"><div style="font-size:22px;font-weight:800;color:var(--cyan);font-family:'Orbitron',monospace">${analysis.virality||72}%</div><div style="font-size:11px;color:var(--muted)">Viral Score</div></div>
+      <div style="text-align:center"><div style="font-size:22px;font-weight:800;color:var(--gold);font-family:'Orbitron',monospace">${analysis.readabilityScore||80}%</div><div style="font-size:11px;color:var(--muted)">Readability</div></div>`;
+    document.getElementById('psychInsight').textContent = '💡 ' + (analysis.psychologicalInsight||'');
+    document.getElementById('subEmotions').innerHTML = (analysis.subEmotions||[]).map(e=>
+      `<span style="font-size:11px;padding:3px 10px;border-radius:100px;background:#ff6b9d11;color:var(--alt);border:1px solid #ff6b9d33">${e}</span>`).join('');
+  } catch(e) {}
+}
+
+// ── BRAINSTORM ────────────────────────────────────────────────────────────────
+async function handleBrainstorm() {
+  const seed = document.getElementById('stormInput').value.trim();
+  if(!seed) return;
+  const btn = document.getElementById('stormBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Storming...';
+  document.getElementById('ideasGrid').innerHTML = '';
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514', max_tokens:1000,
+        system:'You are a hyper-creative startup idea generator. Return ONLY a pure JSON array of 8 ideas (no markdown, no backticks). Each: {"name":string,"tagline":string,"market":string,"wow":string}',
+        messages:[{role:'user',content:'Generate breakthrough startup ideas based on: '+seed}],
+      }),
+    });
+    const data = await res.json();
+    let ideas = [];
+    try { ideas = JSON.parse((data.content?.[0]?.text||'[]').replace(/```json|```/g,'').trim()); } catch{}
+    const colors = ['#6c63ff','#ff6b9d','#00e5ff','#f5c842'];
+    document.getElementById('ideasGrid').innerHTML = ideas.map((idea,i)=>`
+      <div class="card" style="border-color:${colors[i%4]}22;">
+        <div class="idea-num">IDEA #${String(i+1).padStart(2,'0')}</div>
+        <div class="idea-name" style="color:var(--text)">${idea.name||'—'}</div>
+        <div class="idea-tag" style="color:var(--cyan)">${idea.tagline||''}</div>
+        <div class="idea-meta">📊 ${idea.market||''}</div>
+        <div style="font-size:12px;color:var(--gold);margin-top:4px;">✦ ${idea.wow||''}</div>
+      </div>`).join('');
+  } catch(e) {
+    document.getElementById('ideasGrid').innerHTML = '<p style="color:var(--muted)">Error generating ideas. Try again.</p>';
+  }
+  btn.disabled = false;
+  btn.innerHTML = '⚡ Ignite Storm';
+}
+
+function copyOutput() {
+  const text = document.getElementById('outputText').textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    const t = document.getElementById('toast');
+    t.style.display = 'block';
+    setTimeout(()=>t.style.display='none',2500);
+  });
+}
+
+function flashInput() {
+  const ta = document.getElementById('promptInput');
+  ta.style.borderColor = 'var(--alt)';
+  ta.focus();
+  setTimeout(()=>ta.style.borderColor='',1000);
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────────────────────
+function initDashboard() {
+  // DNA metrics
+  const dnaData = [
+    {label:'Emotional Intelligence',val:88,color:'var(--accent)'},
+    {label:'Narrative Complexity',val:74,color:'var(--cyan)'},
+    {label:'Persuasion Power',val:92,color:'var(--alt)'},
+    {label:'Viral Potential',val:85,color:'var(--gold)'},
+    {label:'SEO Optimization',val:79,color:'var(--success)'},
+  ];
+  document.getElementById('dnaMetrics').innerHTML = dnaData.map(s=>`
+    <div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+        <span style="font-size:12px">${s.label}</span>
+        <span style="font-size:12px;color:${s.color};font-family:'Orbitron',monospace">${s.val}%</span>
+      </div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${s.val}%;background:${s.color};box-shadow:0 0 8px ${s.color}88"></div></div>
+    </div>`).join('');
+
+  // Emotion dist
+  const emoData = [
+    {emotion:'Confident',pct:35,color:'var(--accent)'},
+    {emotion:'Excited',pct:22,color:'var(--gold)'},
+    {emotion:'Empathetic',pct:18,color:'var(--cyan)'},
+    {emotion:'Inspirational',pct:15,color:'var(--alt)'},
+    {emotion:'Other',pct:10,color:'var(--muted)'},
+  ];
+  document.getElementById('emotionDist').innerHTML = emoData.map(e=>`
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <div style="font-size:12px;width:110px">${e.emotion}</div>
+      <div style="flex:1"><div class="prog-bar"><div class="prog-fill" style="width:${e.pct}%;background:${e.color}"></div></div></div>
+      <div style="font-size:11px;color:${e.color};font-family:'Orbitron',monospace;width:30px;text-align:right">${e.pct}%</div>
+    </div>`).join('');
+
+  // Activity
+  const activity = [
+    {type:'✍️ Blog Post',title:'The Future of Remote Work in 2026',emotion:'Confident',viral:87,time:'2m ago'},
+    {type:'🚀 Pitch Deck',title:'AI-powered Healthcare Navigation',emotion:'Excited',viral:94,time:'18m ago'},
+    {type:'💼 LinkedIn',title:'Why I quit my $300K job to build...',emotion:'Inspirational',viral:98,time:'1h ago'},
+    {type:'🎬 Story',title:'The Last Algorithm — A Sci-Fi Thriller',emotion:'Melancholic',viral:71,time:'3h ago'},
+    {type:'📣 Campaign',title:'Gen Z Mental Health App Launch',emotion:'Empathetic',viral:82,time:'5h ago'},
+  ];
+  document.getElementById('activityList').innerHTML = activity.map(a=>`
+    <div class="activity-row">
+      <span class="activity-type">${a.type}</span>
+      <span class="activity-title">${a.title}</span>
+      <span class="activity-emotion">${a.emotion}</span>
+      <span class="activity-viral" style="color:${a.viral>90?'var(--success)':'var(--gold)'}">${a.viral}%</span>
+      <span class="activity-time">${a.time}</span>
+    </div>`).join('');
+}
+
+// ── ANALYTICS ─────────────────────────────────────────────────────────────────
+function initAnalytics() {
+  const viralData = [
+    {content:'LinkedIn Post — Leadership',predicted:91,actual:94},
+    {content:'Startup Pitch — HealthTech',predicted:85,actual:88},
+    {content:'Blog — Future of Work',predicted:78,actual:82},
+    {content:'Twitter Thread — AI Ethics',predicted:95,actual:92},
+    {content:'Email Campaign — SaaS',predicted:70,actual:74},
+  ];
+  document.getElementById('viralAccuracy').innerHTML = viralData.map(r=>`
+    <div style="padding:12px;background:rgba(0,0,0,.3);border-radius:8px">
+      <div style="font-size:12px;margin-bottom:8px">${r.content}</div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <div style="flex:1">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:3px">Predicted</div>
+          <div class="prog-bar"><div class="prog-fill" style="width:${r.predicted}%;background:var(--accent)"></div></div>
+        </div>
+        <div style="flex:1">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:3px">Actual</div>
+          <div class="prog-bar"><div class="prog-fill" style="width:${r.actual}%;background:var(--success)"></div></div>
+        </div>
+        <span style="font-size:11px;color:${Math.abs(r.predicted-r.actual)<=5?'var(--success)':'var(--gold)'};font-family:'Orbitron',monospace">
+          ${r.predicted>r.actual?'−':'+'}${Math.abs(r.predicted-r.actual)}%
+        </span>
+      </div>
+    </div>`).join('');
+
+  const cats = [
+    {label:'LinkedIn Posts',count:847,pct:30,color:'var(--accent)'},
+    {label:'Blog Articles',count:623,pct:22,color:'var(--cyan)'},
+    {label:'Startup Pitches',count:491,pct:17,color:'var(--alt)'},
+    {label:'Marketing Copy',count:384,pct:13,color:'var(--gold)'},
+    {label:'Stories & Scripts',count:298,pct:10,color:'var(--success)'},
+    {label:'Other',count:204,pct:8,color:'var(--muted)'},
+  ];
+  document.getElementById('contentCategories').innerHTML = cats.map(c=>`
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+      <div style="font-size:12px;width:130px">${c.label}</div>
+      <div style="flex:1"><div class="prog-bar" style="height:8px"><div class="prog-fill" style="height:8px;width:${c.pct}%;background:${c.color};box-shadow:0 0 8px ${c.color}66"></div></div></div>
+      <span style="font-size:11px;color:${c.color};font-family:'Orbitron',monospace;width:32px">${c.count}</span>
+    </div>`).join('');
+}
+
+// ── MEMORY ────────────────────────────────────────────────────────────────────
+function initMemory() {
+  const vals = [72,65,80,85,78,90,88,95,82,91,87,93,76,88,85,92,89,95,91,98,88,94,90,96,85,92,88,97,93,99];
+  const el = document.getElementById('emoTimeline');
+  el.innerHTML = vals.map((v,i)=>`
+    <div class="emo-bar-item" style="height:${v}%;opacity:${0.5+(i/30)*.5}" title="Day ${i+1}: ${v}% confident"></div>`).join('');
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  initGenerator();
+  initDashboard();
+  initAnalytics();
+  initMemory();
+});
+</script>
+</body>
+</html>
